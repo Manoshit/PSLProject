@@ -1,0 +1,320 @@
+﻿@model Auth.ViewModels.AdminEditPizzaView
+@using Auth.Models
+@{
+    ViewBag.Title = "Edit";
+}
+
+
+
+
+
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header justify-content-center">
+                    <h3 class="mb-0">EDIT YOUR PIZZA</h3>
+                </div>
+                <div class="card-body">
+                    <form onsubmit="return false">
+
+
+                        <div class="form-horizontal ">
+
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="form-group">
+
+                                @Html.LabelFor(model => Model.pizza.name, htmlAttributes: new { @class = "control-label " })
+
+                                @Html.EditorFor(model => Model.pizza.name, new { htmlAttributes = new { @class = "form-control col-md-12", @id = "name" } })
+                                @Html.ValidationMessageFor(model => Model.pizza.name, "", new { @class = "text-danger" })
+
+                            </div>
+                            <input type="hidden" id="pizzaId" value="@Model.pizza.id"/>
+                            <div class="form-group">
+
+                                @Html.LabelFor(model => Model.pizza.description, htmlAttributes: new { @class = "control-label" })
+
+                                @Html.TextAreaFor(model => Model.pizza.description, new { @class = "form-control col-md-12", @id = "description" })
+                                @Html.ValidationMessageFor(model => Model.pizza.description, "", new { @class = "text-danger" })
+
+
+                            </div>
+
+                            <div class="form-group">
+
+                                @Html.LabelFor(model => Model.pizza.category, htmlAttributes: new { @class = "control-label " })
+
+                                @Html.DropDownList("category", new SelectList(Enum.GetValues(typeof(cat))), "Select Category", new { @class = "form-control col-md-12" })
+                                @Html.ValidationMessageFor(model => Model.pizza.category, "", new { @class = "text-danger" })
+
+
+
+                            </div>
+
+                            <div class="form-group">
+
+                                @Html.LabelFor(model => Model.pizza.imageUrl, htmlAttributes: new { @class = "control-label" })
+
+                                @Html.EditorFor(model => Model.pizza.imageUrl, new { htmlAttributes = new { @class = "form-control col-md-12", @id = "imageUrl" } })
+                                @Html.ValidationMessageFor(model => Model.pizza.imageUrl, "", new { @class = "text-danger" })
+
+
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <label class="control-label"> Size</label>
+                                </div>
+                                <div class="col">
+
+                                    @foreach (var item in Model.size)
+                                    {
+                                        <div class="form-check">
+                                            <input checked class="form-check-input" type="checkbox" name="@item.name" onclick="dynInput(this);" id=@item.id />
+                                            <label class="form-check-label" for="checked1">
+                                                @item.name
+                                            </label>
+                                        </div>
+
+                                    }
+
+
+                                    @{
+                                        List<string> temp = new List<string> { "small", "medium", "large" };
+                                    }
+
+                                    @if (Model.size.Count < 3)
+                                    {
+                                        foreach (var item in temp)
+                                        {
+                                            var flag = 0;
+                                            foreach (var modelItem in Model.size)
+                                            {
+                                                if (item != modelItem.name)
+                                                {
+                                                    flag = 1;
+                                                }
+                                            }
+                                            if (flag == 1)
+                                            {
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="@item" onclick="dynInput(this);" id="checked1" />
+                                                    <label class="form-check-label" for="checked1">
+                                                        @item
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+
+                            <p id="insertinputs"></p>
+                            @foreach (var item in Model.size)
+                            {
+                                <div id="@item.name" name="@item.id">
+                                   <p> Price for @item.name</p>
+                                    
+                                    <input type="hidden" value="@item.id" />
+                                    <input type="text" class="form-control col-md-12" id="@item.name+input" value="@item.price" />
+                                </div>
+                            }
+
+
+
+
+                            <div class="form-group">
+                                <div class="row my-2">
+                                    <div class="col-md-offset-2 col-md-6">
+                                        <input type="submit" id="but" value="Save" class="btn btn-danger" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        @Html.ActionLink("Back to Products", "Index")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="wait" style="display:none;width:69px;height:89px;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;">
+
+    <img src="~/Content/images/demo_wait.gif" width="64" height="64" />
+    <br>
+    Loading..
+</div>
+
+
+<script>
+    var listOfCheckedSizes = [];
+    var listOfPrices = [];
+    var pizId = null;
+    var listOfSizeObjects = [];
+   (function myfun () {
+        var markedCheckbox = document.querySelectorAll('input[type="checkbox"]:checked'); 
+        for (var checkbox of markedCheckbox) {
+            listOfCheckedSizes.push(checkbox.name)
+   
+        }  
+    })();
+    
+    function dynInput(cbox) {
+       
+        if (cbox.checked) {
+            var input = document.createElement("input");
+            input.type = "text";
+            input.id = cbox.name +"+"+"input";
+            input.className = "form-control col-md-12"
+            var div = document.createElement("div");
+            listOfCheckedSizes.push(cbox.name);
+            div.id = cbox.name;
+            div.setAttribute("name",0);
+            div.innerHTML = "<p> Price For " + cbox.name + "</p>";
+            div.appendChild(input);
+            document.getElementById("insertinputs").appendChild(div);
+        } else {
+           
+
+            if (document.getElementById(cbox.name).getAttribute("name") != 0 ) {
+                $.ajax({
+
+                    url: 'https://localhost:44355/api/size/DeleteSingle' + "/" + cbox.getAttribute("id"),
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                   
+                });
+            }
+           
+            document.getElementById(cbox.name).remove();
+            var index = listOfCheckedSizes.indexOf(cbox.name);
+            if (index > -1)
+                listOfCheckedSizes.splice(index, 1);
+         
+        }
+    }
+
+    document.getElementById("but").addEventListener("click", function () {
+
+        var pizza = new Object();
+        pizza.id =  parseInt( document.getElementById("pizzaId").value);
+        pizza.name = document.getElementById("name").value;
+        pizza.description = document.getElementById("description").value;
+        pizza.category = document.getElementById("category").value;
+        pizza.imageUrl = document.getElementById("imageUrl").value;
+
+      
+        console.log(pizza);
+        if (listOfCheckedSizes.length > 0) {
+            $.ajax({
+
+                url: 'https://localhost:44355/api/admin' + "/" + (document.getElementById("pizzaId").value),
+                type: 'PUT',
+                dataType: 'json',
+                data: pizza,
+                beforeSend: function () {
+                    // console.log(pizza);
+                    $("#wait").css("display", "block");
+                },
+
+                success: function (result) {
+
+
+
+                    console.log("pizza entered");
+                },
+
+                complete: function () {
+                    $("#wait").css("display", "none");
+
+
+                    for (var i = 0; i < listOfCheckedSizes.length; i++) {
+                        var size_price = new Object();
+                        var priceIdString = listOfCheckedSizes[i].toString() + "+" + "input";
+                        console.log(priceIdString);
+
+                        var hiddenCatId = document.getElementById(listOfCheckedSizes[i]).getAttribute("name");
+                        console.log(hiddenCatId);
+                        var price = document.getElementById(priceIdString).value;
+                        listOfPrices.push(price);
+                        size_price.id = parseInt(hiddenCatId);
+                        size_price.name = listOfCheckedSizes[i];
+                        size_price.price = parseInt(price);
+                        size_price.pizzaId = parseInt(document.getElementById("pizzaId").value);
+                        console.log(size_price);
+                        listOfSizeObjects.push(size_price);
+
+                        if (hiddenCatId != 0) {
+
+                            $.ajax({
+
+                                url: 'https://localhost:44355/api/size' + "/" + parseInt(document.getElementById("pizzaId").value),
+                                type: 'PUT',
+                                dataType: 'json',
+                                data: size_price,
+                                success: function (result) {
+                                    console.log("size entered");
+                              
+                                },
+
+                                complete: function () {
+
+
+                                }
+                            });
+                        }
+                        else {
+
+                            $.ajax({
+
+                                url: 'https://localhost:44355/api/size',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: size_price,
+                                success: function (result) {
+                                    console.log("size entered");
+
+                                },
+                                complete: function () {
+
+
+                                }
+                            });
+
+                        }
+
+
+                    }
+                    bootbox.dialog({
+                        message: 'Your product was updated',
+                        closeButton: true,
+                        centerVertical: true,
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+                },
+            });
+        }
+        else {
+            var dialog = bootbox.dialog({
+                message: 'Are you missing a size',
+                closeButton: true,
+                centerVertical:true,
+            }).find(".modal-dialog")
+                .addClass("modal-dialog-centered");
+
+            
+        }
+
+    });
+
+</script>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+

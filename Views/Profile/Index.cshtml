@@ -1,0 +1,113 @@
+﻿
+
+@model Auth.Models.Registeration
+
+
+@{
+    ViewBag.Title = "Register";
+    //  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container my-5">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header justify-content-center">
+                    <h3 class="mb-0">Your Profile</h3>
+                </div>
+                <div class="card-body">
+
+                   <form onsubmit="return false">
+                       
+                        <div>
+                            <fieldset>
+
+                                <div class="editor-label">@Html.LabelFor(u => u.Email)</div>
+                                <div class="editor-field">
+                                    @Html.EditorFor(u => u.Email, new { htmlAttributes = new { @class = "form-control col-md-12",@id="email", @disabled = "true", @value = Model.Email } })
+                                    @Html.ValidationMessageFor(u => u.Email)
+                                </div>
+
+
+                                <div class="editor-label">@Html.LabelFor(u => u.FirstName)</div>
+                                <div class="editor-field">
+                                    @Html.EditorFor(u => u.FirstName, new { htmlAttributes = new { @class = "form-control col-md-12",@id="firstName" ,@value = Model.FirstName } })
+                                    @Html.ValidationMessageFor(u => u.FirstName)
+                                </div>
+                                <div class="editor-label">@Html.LabelFor(u => u.LastName)</div>
+                                <div class="editor-field">
+                                    @Html.EditorFor(u => u.LastName, new { htmlAttributes = new { @class = "form-control col-md-12", @id="lastName",@value = Model.LastName } })
+                                    @Html.ValidationMessageFor(u => u.LastName)
+                                </div>
+                                <div class="editor-label">@Html.LabelFor(u => u.Address)</div>
+                                <div class="editor-field">
+                                    @Html.TextAreaFor(u => u.Address, new { @class = "form-control col-lg-12", @rows = "5",@id="address",@value=Model.Address })
+                                    @Html.ValidationMessageFor(u => u.Address, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="my-3">
+                                    <input type="submit" id="save" value="Save Changes" class="col-md-12 btn btn-outline-secondary btn-block" />
+                                </div>
+                            </fieldset>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#save").click(function () {
+
+        var profile = new Object();
+
+        profile.email = $("#email").val();
+        profile.lastName = $("#lastName").val();
+        profile.firstName = $("#firstName").val();
+        profile.address = $("#address").val();
+
+        $.ajax({
+            url: 'https://localhost:44355/api/Profile',
+            type: 'PUT',
+
+            dataType: 'json',
+            data: profile,
+
+            onerror: function (err) {
+                console.log(err);
+            },
+            success: function (result) {
+
+                console.log(result);
+               
+
+            },
+            complete: function (result) {
+                if (result.status == 200) {
+                   
+                    bootbox.dialog({
+                        message: "Your profile was updated",
+                        closeButton: true
+
+                    }).find(".modal-dialog").addClass("modal-dialog-centered");
+                }
+                else {
+                    bootbox.dialog({
+                        message: result.responseJSON['Message'],
+                        className: 'animate__animated animate__bounce',
+                        closeButton: true
+
+                    }).find(".modal-dialog").addClass("modal-dialog-centered");
+                }
+            },
+
+        });
+    });
+</script>
+
+
+
+
+

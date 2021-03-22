@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
+    <link href="@Url.Content("~/Content/bootstrap.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" />
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/bootbox.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md  fixed-top" style="background-color:white;">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                @Html.ActionLink("Online Pizza Ordering System", "Index", "Home", new { area = "" }, new { @class = "navbar-brand ", @style = "color:red" })
+            </div>
+            <div class=" collapse navbar-collapse  order-3  " id="navbarTogglerDemo03">
+                <ul class="navbar-nav ml-auto nav">
+                    <li class="nav-item">@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+
+                    @if (User.IsInRole("user"))
+                    {
+
+                        <li class="dropdown nav-item">
+                            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">Products <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                @Html.ActionLink("All Pizzas", "Index", "Client", new { area = "" }, new { @class = "dropdown-item " })
+                                @Html.ActionLink("Veg ", "FindPizza", "Client", new { id = "veg" }, new { @class = "dropdown-item" })
+                                @Html.ActionLink("Non Veg ", "FindPizza", "Client", new { id = "nonveg" }, new { @class = "dropdown-item" })
+
+
+
+                            </ul>
+                        </li>
+                        <li class="nav-item"> @Html.ActionLink("Cart", "Index", "Cart", new { area = "" }, new { @class = "nav-link" })</li>
+
+
+
+
+                    }
+                    else if (User.IsInRole("admin"))
+                    {
+                        <li class="dropdown nav-item">
+                            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">Dashboard <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+
+                                @Html.ActionLink("Products", "Index", "Admin", new { area = "" }, new { @class = "dropdown-item" })
+                                @Html.ActionLink("Inventory", "Index", "Inventory", new { area = "" }, new { @class = "dropdown-item" })
+                                @Html.ActionLink("Manage Delivery Executives", "Index", "Delivery", new { area = "" }, new { @class = "dropdown-item" })
+                            </ul>
+                        </li>
+                      
+                    }
+                    @if (Request.IsAuthenticated)
+                    {
+
+                        <li class="dropdown nav-item">
+                            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                @if (User.IsInRole("user"))
+                                {
+                                    @Html.ActionLink("Profile", "Index", "Profile", new { area = "" }, new { @class = "dropdown-item " })
+                                }
+
+                                @*@if (User.IsInRole("Delivery"))
+                                {
+                                    @Html.ActionLink("Current Order", "Index", "OrderHistory", new { }, new { @class = "dropdown-item" })
+
+                                }*@
+
+                                @Html.ActionLink("Your Orders", "Index", "OrderHistory", new { }, new { @class = "dropdown-item" })
+
+
+
+
+
+                            </ul>
+                        </li>
+                        <li>@Html.ActionLink("Logout", "LogOut", "User", new { area = "" }, new { @class = "nav-link" })</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Register", "Register", "User", new { area = "" }, new { @class = "nav-link" })</li>
+
+
+
+
+                        <li>@Html.ActionLink("Login", "Login", "User", new { area = "" }, new { @class = "nav-link" })</li>
+
+
+
+                    }
+                </ul>
+                    @*@Html.Partial("_LoginPartial")*@
+                </div>
+        </div>
+    </nav>
+
+    <div class="container body-content">
+        @RenderBody()
+
+    </div>
+    <script>
+        $('ul.nav li.dropdown').hover(function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+        }, function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+        });
+    </script>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

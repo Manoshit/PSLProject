@@ -1,0 +1,136 @@
+﻿@model Auth.ViewModels.AdminPizzaView
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+
+<div class="toast"  role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" style="position: absolute; top: 3rem; right: 3rem;">
+    <div class="toast-header">
+
+        <strong class="mr-auto">Notification</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+        Item added to your cart
+    </div>
+</div>
+
+
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @foreach (var item in Model.pizzas)
+    {
+
+
+        <div class="col my-4">
+
+            <div class="card h-100">
+                <img class="card-img-top" src="@item.imageUrl" alt="Bologna">
+                <div class="card-body">
+                    <h4 class="card-title" id="name">@item.name</h4>
+                    <p class="card-text" id="desc">@item.description </p>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12 my-2">
+                            <div><p class="card-text text-muted">Available in </p></div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <select class="form-control dropdown" name="@item.id.ToString()">
+                            @foreach (var size in Model.sizes)
+                            {
+                                if (item.id == size.pizzaId)
+                                {
+
+                                    <option value="1">@char.ToUpper(size.name[0])@size.name.Substring(1) - Rs @size.price</option>
+
+                                }
+                            }
+                        </select>
+                    </div>
+
+
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <a href="#" id="Add" data-select="@item.id.ToString()" class="btn-outline-success btn btn-block editbutton" data-toggle="modal" data-target="#smallModal">ADD TO CART</a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+
+        </div>
+    }
+
+</div>
+<script>
+    $(document).on('click','#Add',function (event) {
+
+        var value = $(this).parent().parent().parent().parent().find("h4").text();
+
+        var target = $(this).data("select");
+        var dropText = ($('select[name=' + target + '] option:selected').text());
+
+        var price = new String("");
+        var size = new String("");
+        console.log(dropText);
+        for (var i = 0; i < dropText.length; i++)
+        {
+            if (dropText[i] != " ")
+                size = size.concat(dropText[i])
+            else
+                break;
+
+        }
+        for (var i = dropText.length-1; i>=0; i--) {
+            if (dropText[i] != " ")
+                price = price.concat(dropText[i])
+            else
+                break;
+
+        }
+        console.log(size);
+        console.log(parseInt(price.split("").reverse().join("")));
+
+     
+
+        var cartItem = new Object();
+        cartItem.pizzaId = target;
+        cartItem.pizzaName = value;
+        cartItem.pizzaPrice = parseInt(price.split("").reverse().join(""));
+        cartItem.pizzaSize = size;
+        cartItem.quantity =1;
+        cartItem.customerId = "@User.Identity.Name";
+
+  
+
+
+        $.ajax({
+            url: 'https://localhost:44355/api/Cart',
+            type: 'POST',
+           // dataType: 'json',
+            data: cartItem,
+            complete: function (result) {
+
+                if (result.status == 200)
+                    $('.toast').toast('show');
+               
+            }
+        });
+    })
+
+</script>

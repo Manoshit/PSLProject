@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Auth.Models.Registeration>
+@{
+    ViewBag.Title = "Index";
+}
+<p>
+    @Html.ActionLink("ADD NEW", "Create", "Delivery", new { area = "" }, new { })
+</p>
+
+<h2>Your Delivery Executives</h2>
+<div class="row row-cols-1 row-cols-md-4 g-4 my-lg-3">
+    @foreach (var item in Model)
+    {
+
+        
+                    <div class="card mx-2 my-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p><strong>Name</strong></p>
+                                </div>
+
+                                <div class="col-md-8 d-flex justify-content-end">
+                                    <p>@item.FirstName @item.LastName</p>
+                                </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p><strong>Address</strong></p>
+                                    </div>
+
+                                    <div class="col-md-8 d-flex justify-content-end">
+                                        <p>@item.Address</p>
+                                    </div>
+                                    
+
+                                </div>
+                            <hr />
+
+                            <a href="#" class="btn btn-block btn-danger remove" name="@item.UserId" >Remove</a>
+
+                        </div>
+                    </div>
+          }
+  </div>
+
+<script>
+    $('.remove').click(function () {
+        var id = $(this).attr('name');
+        $.ajax({
+            url: 'https://localhost:44355/api/delivery' + "/" + parseInt(id),
+            type: 'DELETE',
+            contentType:'application/json',
+            success: function (result) {
+                console.log(result);
+                bootbox.dialog({
+                    message: 'Removed Successfully',
+                    closeButton: true,
+                    className: 'animate__animated animate__tada',
+                    centerVertical: true,
+                    onEscape: function () {
+                        document.location.reload();
+                    }
+                }).find(".modal-dialog")
+                    .addClass("modal-dialog-centered");
+            }
+
+
+        })
+
+    })
+</script>
+
+

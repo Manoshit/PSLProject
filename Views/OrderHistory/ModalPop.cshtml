@@ -1,0 +1,120 @@
+﻿@model Auth.Models.Order
+
+
+<div class="modal-dialog modal-fluid modal-notify modal-success modal-right" role="document">
+
+    <div class="modal-content">
+        <!--Body-->
+        <div class="modal-body">
+            <div class=row>
+                <div class="col-md-6">
+                    <p> <strong>Order ID : @Model.id</strong></p>
+
+                </div>
+                <div class="col-md-5">
+
+                <p><strong>@Model.timeStamp</strong></p>
+
+                </div>
+                <div class="col-md-1">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+                        <span aria-hidden="true" id="closeButton" class="white-text">×</span>
+
+                    </button>
+
+                </div>
+
+
+            </div>
+            <div class=row><div class=col-md-12><p>STATUS : @Model.status.ToUpperInvariant() </p></div></div>
+            <hr />
+            <div class=row>
+
+                <div class=col md-12>
+
+                    <p> <strong> Delivery Address</strong></p>
+
+                </div>
+
+              </div>
+            <div class="row">
+                <div class=col md-12>
+
+                    <p>@Model.customer.Address</p>
+
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <h6><strong>Item Details</strong></h6>
+                </div>
+            </div>
+            @foreach (var item in Model.OrderDetails)
+            {
+                <div class="row">
+                    <div class="col-md-1 pl-3">
+                        @if (item.Pizza.category.ToLower() == "non veg")
+                        {
+                            <img src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
+                        }
+                        else
+                        {
+                            <img width="15" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Indian-vegetarian-mark.svg" />
+
+                        }
+                    </div>
+                    <div class="col-md-11 pr-5">
+                        <div class="row">
+                            <div class="col-md-8">
+                                @item.Pizza.name - @item.pizzaSize x @item.quantity
+                            </div>
+                            @{
+                                var price = @item.quantity * item.price;
+                            }
+                            <div class="col-md-4 d-flex justify-content-end">
+                                <strong> Rs  @price</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <h6><strong>Bill Details</strong></h6>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <h6><strong>Total</strong></h6>
+                </div>
+                <div class="col-md-3 d-flex justify-content-end">
+                    <strong>Rs @Model.totalAmount</strong>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <h6><strong>Payment Mode</strong></h6>
+                </div>
+                <div class="col-md-12 text-muted">
+                    <h6><strong>Cash on delivery</strong></h6>
+                </div>
+            </div>
+
+        </div>
+
+        <!--Footer-->
+       
+    </div>
+    <!--/.Content-->
+</div>
+<script>
+    $("#closeButton").click(function (event) {
+        document.location.reload();
+    }); 
+</script>

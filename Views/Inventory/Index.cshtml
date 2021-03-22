@@ -1,0 +1,126 @@
+﻿@model Auth.ViewModels.InventoryView
+
+<h4>
+    Your Inventory
+</h4>
+
+<div class="container mt-5 ml-lg-5" >
+    <table id="cart" class="table table-borderless table-sm table-condensed  " style=" width:auto;margin-left: auto; margin-right: auto;">
+        <thead>
+            <tr>
+                <th style="width:20%">Name</th>
+               
+                <th  style="width:8%">Quantity</th>
+                
+                
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.pizzas)
+            {
+                <tr class="data">
+                    <td data-th="Product">
+                        <div class="row">
+                            @item.name
+                        </div>
+                    </td>
+                    @{ 
+                        var quantity = Model.quantities.Where(q => q.pizzaId == item.id).FirstOrDefault();
+                    }
+                    <td data-th="Items In Stock">
+                        <div class="input-group ">
+                            <div class="input-group-prepend my-1 plus">
+                                <i class="bi bi-plus"></i>
+                            </div>
+                            <input name="@item.id" type="text" style="border-width: 0px; border: none; border-radius:10px; width:30px" disabled  value="@quantity.quantity">
+                            <div class="input-group-append my-1 minus">
+                                <i class="bi bi-dash"></i>
+                            </div>
+                        </div>
+
+
+
+                    </td>
+                  
+                
+                    <td class="actions" data-th="">
+
+                        <button name="@quantity.id" class="btn btn-danger btn-sm btn-delete update">Update Stock</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+       
+    </table>
+</div>
+
+
+
+<script>
+
+   
+    $('.plus').click(function () {
+        var input = $(this).parent().parent().find('input');
+        input.val(parseInt(input.val()) + 1);
+      
+    })
+
+    $('.minus').click(function () {
+        var input = $(this).parent().parent().find('input');
+        var value;
+        if ((parseInt(input.val()) - 1) < 0) {
+            value = 0;
+        }
+        else {
+            value = parseInt(input.val()) - 1;
+        }
+        
+        input.val(value);
+        
+    })
+
+    $('.update').click(function () {
+
+        var id = $(this).attr('name');
+        var inputValue = $(this).parent().parent().find('input').val();
+        var obj = new Object();
+        obj.value = inputValue,
+        console.log(inputValue);
+
+        $.ajax({
+            url: "https://localhost:44355/api/inventory" + "/" + parseInt(id),
+            type: "PUT",
+            dataType:'json',
+            data: obj,
+           
+            success: function (result) {
+                bootbox.dialog({
+                    message: 'Your inventory was updated',
+                    closeButton: true,
+                    className: 'animate__animated animate__tada',
+                    centerVertical: true,
+                    onEscape: function () {
+                        document.location.reload();
+                    }
+                }).find(".modal-dialog")
+                    .addClass("modal-dialog-centered");
+            },
+            complete: function (result) {
+                if (result.status != 200) {
+                    bootbox.dialog({
+                        message: result.responseJSON['Message'],
+                        closeButton: true,
+                        className: 'animate__animated animate__tada',
+                        centerVertical: true,
+                        onEscape: function () {
+                            document.location.reload();
+                        }
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+                }
+                }
+            })
+        });
+   
+</script>

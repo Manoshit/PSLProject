@@ -1,0 +1,272 @@
+﻿@model IEnumerable<Auth.Models.Cart>
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<div class="container justify-content-center align-content-center" id="emptyCart" style="padding-left:9rem">
+    <div class="row">
+        <div class="col-md-12">
+            <img src="https://www.tyjara.com/assets/site/img/empty-cart.png"/>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <table id="cart" class="table  table-condensed">
+        <thead>
+            <tr>
+                <th style="width:30%">Name</th>
+                <th style="width:20%">Size</th>
+                <th style="width:10%">Price</th>
+                <th style="width:8%">Quantity</th>
+                <th style="width:22%" class="text-center">Subtotal</th>
+                <th style="width:10%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            @foreach (var item in Model)
+            {
+            <tr class="data">
+                <td data-th="Product">
+                    <div class="row">
+                        @item.pizzaName
+                    </div>
+                </td>
+                <td data-th="Size">@item.pizzaSize</td>
+                <td data-th="Price">Rs @item.pizzaPrice</td>
+                <td data-th="Quantity">
+                    <div class="input-group ">
+                        <div class="input-group-prepend my-1 plus">
+                            <i class="bi bi-plus"></i>
+                        </div>
+                        <input name="@item.id" type="text" style="border-width: 0px; border: none; border-radius:30px;" disabled class="form-control" value="@item.quantity">
+                        <div class="input-group-append my-1 minus">
+                            <i class="bi bi-dash"></i>
+                        </div>
+                    </div>
+
+
+
+                </td>
+                @{ 
+                    var sub = item.pizzaPrice * item.quantity;
+                }
+                <td data-th="Subtotal"  name="@item.pizzaPrice" id="price" class="text-center cartprice">Rs @sub</td>
+                <td class="actions" data-th="">
+
+                    <button name="@item.id" id="Delete" class="btn btn-danger btn-sm btn-delete">Delete</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+           
+            <tr>
+                <td>@Html.ActionLink("Continue Shopping","Index","Client",new { },new { @class="btn btn-warning", @style="color:white"})</td>
+                <td colspan="2" class="hidden-xs"></td>
+                <td class="hidden-xs text-center totalprice"><strong></strong></td>
+                <td><a href="#" id="Checkout" class="btn btn-success btn-block" data-toggle="modal" data-target="#myModal" >Checkout <i class="fa fa-angle-right"></i></a></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<div class="modal fade right" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <p class="heading lead">Checkout</p>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">×</span>
+                </button>
+            </div>
+
+            <!--Body-->
+            <div class="modal-body">
+                <div class="text-center">
+        
+                </div>
+                <div class="address">
+
+                </div>
+            </div>
+
+            <!--Footer-->
+            <div class="modal-footer">
+                <p>Place Order</p>
+                <a href="#" type="button" id="placeOrder" class="btn btn-primary-modal" data-dismiss="modal">YES </a>
+                <a href="#" type="button" class="btn btn-outline-secondary-modal " data-dismiss="modal">NO</a>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+
+
+<script>
+
+    $('.minus').click(function () {
+        var $input = $(this).parent().parent().find('input');
+        var count = parseInt($input.val()) - 1;
+        count = count < 1 ? 1 : count;
+        $input.val(count);
+        $input.change();
+        return false;
+    });
+    $('.plus').click(function () {
+        var $input = $(this).parent().parent().find('input');
+        $input.val(parseInt($input.val()) + 1);
+        $input.change();
+        return false;
+    });
+
+    $('.input-group input').change(function () {
+
+        var qty = parseInt( $(this).val());
+        var subTotal = $(this).closest("tr").find(".cartprice").attr("name");
+        var cartItemId = parseInt( $(this).attr('name'));
+        $(this).closest("tr").find(".cartprice").html("Rs" + " " + subTotal * qty);
+
+       
+        $.ajax({
+            url: "https://localhost:44355/api/cart" +"/"+cartItemId+"?quantity="+qty,
+            type: "PUT",
+           
+            error: function (error) {
+                console.log(error);
+            },
+            success: function (result) {
+                console.log(result);
+            }
+        });
+
+        updateCartValue();
+    });
+
+    function updateCartValue() {
+        var total = 0;
+        var flag = 0;
+        $(".cartprice").each(function () {
+            flag = 1;
+            total = total + parseInt($(this).text().substring(2));
+        });
+        if (flag == 1) {
+            $(".totalprice").html("Rs" + " " + total.toString());
+            $("#emptyCart").hide();
+        }
+        else {
+            $("#cart").remove();
+            $("#emptyCart").show();
+        }
+    }
+
+    $(document).ready(function () {
+         updateCartValue();
+    });
+
+
+    $("#cart").on('click', '.btn-delete', function (event) {
+        $(this).closest('tr').remove();
+        $.ajax({
+            url: 'https://localhost:44355/api/cart' + "/" + parseInt($(this).attr('name').toString()),
+            type: 'DELETE',
+
+            contentType: 'application/json',
+
+            success: function (result) {
+
+                updateCartValue();
+
+
+            },
+            complete: function () {
+             //  $(this).closest('tr').remove();
+            },
+
+        });
+
+
+    });
+
+    $('#myModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+        var recipient = button.parent().prev().html();
+        console.log(recipient);
+        var modal = $(this)
+        modal.find('.modal-body').find(".text-center").text('Total Price ' + recipient)
+ 
+    })
+
+    $("#placeOrder").click(function () {
+
+        var price = $(".totalprice").html();
+        price = price.substring(3).trim();
+
+       
+        var order = new Object;
+        order.customerId = "@User.Identity.Name";
+        order.status = "Being Prepared";
+        order.totalAmount = parseInt(price);
+        order.timeStamp = (new Date()).toString().split(' ').splice(1, 4).join(' ');
+        console.log(order);
+
+      var dialog = bootbox.dialog({
+            message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Placing your order...</div>',
+            closeButton: true,
+          centerVertical: true,
+          backdrop:false,
+        }).find(".modal-dialog")
+            .addClass("modal-dialog-centered");
+
+
+        $.ajax({
+            url: 'https://localhost:44355/api/order',
+            type: 'POST',
+            dataType:'json',
+            data:order,
+            success: function (result) {
+                
+                bootbox.dialog({
+                    message: 'Order Placed Successfully',
+                    closeButton: true,
+                    className: 'animate__animated animate__tada',
+                    centerVertical: true,
+                    onEscape: function () {
+                        document.location.reload();
+                    }
+                }).find(".modal-dialog")
+                    .addClass("modal-dialog-centered");
+
+            },
+            complete: function (result) {
+                dialog.hide();
+                if (result.status !== 200) {
+                    bootbox.dialog({
+                        message: result.responseJSON["Message"],
+                        closeButton: true,
+                        className: 'animate__animated animate__bounce',
+                        centerVertical: true,
+                        onEscape: function () {
+                            document.location.reload();
+                        }
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+                 
+                } else {
+                  
+                }
+            },
+
+        });
+    });
+
+
+
+</script>

@@ -1,0 +1,51 @@
+﻿
+@model Auth.Models.Registeration
+
+
+
+@{ ViewBag.Title = "LogIn";
+    // Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+    <div class="container my-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header justify-content-center">
+                        <h3 class="mb-0">LOG IN</h3>
+                    </div>
+                    <div class="card-body">
+
+                        @using (Html.BeginForm())
+                        {
+                            @Html.ValidationSummary(true, "",new { @class="text-danger"});
+                            <div>
+                                <fieldset>
+                                    
+                                    <div class="editor-label">@Html.LabelFor(u => u.Email)</div>
+                                    <div class="editor-field">
+                                        @Html.EditorFor(u => u.Email, new { htmlAttributes = new { @class = "form-control col-md-12" } })
+                                        @Html.ValidationMessageFor(u => u.Email)
+                                    </div>
+                                    <div class="editor-label">@Html.LabelFor(u => u.Password)</div>
+                                    <div class="editor-field">
+                                        @Html.EditorFor(u => u.Password , new { htmlAttributes = new { @class = "form-control col-md-12", @type="password"} })
+                                        @Html.ValidationMessageFor(u => u.Password)
+                                    </div>
+                                    <div class="my-3">
+                                        <input type="submit" value="Log In" class="btn btn-block btn-outline-secondary col-md-12" />
+                                    </div>
+                                    
+                                </fieldset>
+                            </div>
+                           
+                            <p>@Html.ActionLink("Register", "Register", "User",  new { @class = "btn btn-block btn-outline-danger col-md-12" })</p>}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+                       

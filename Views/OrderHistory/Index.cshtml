@@ -1,0 +1,261 @@
+﻿@model IEnumerable<Auth.Models.Order>
+
+@{
+    ViewBag.Title = "Your Orders";
+
+    //@Url.Action("ModalPop","OrderHistory",new { id=5})"
+}
+
+<h2>Order History</h2>
+<div class="modal fade right" id="productDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+</div>
+   
+    <div class="row row-cols-1 row-cols-md-2">
+        @foreach (var item in Model)
+        {
+           
+            <div class="col-sm-6 my-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Order ID : @item.id</h6>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                               <strong> @item.status</strong>
+                            </div>
+                        </div>
+                        @if (User.IsInRole("admin") || User.IsInRole("delivery"))
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    Ordered By : @item.customer.FirstName @item.customer.LastName
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+                        <h6 class="text-muted">ITEMS</h6>
+                        @foreach (var orderItem in item.OrderDetails)
+                        {
+
+                            if (item.OrderDetails.Count == 1)
+                            {
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-1 pb-6">
+                                                @if (orderItem.Pizza.category.ToLower() == "non veg")
+                                                {
+                                                    <img src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
+                                                }
+                                                else
+                                                {
+                                                    <img width="15" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Indian-vegetarian-mark.svg" />
+
+                                                }
+                                            </div>
+                                            <div class="col-md-10">
+                                                <p class="card-text">@orderItem.Pizza.name x @orderItem.quantity</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-end">
+                                        <p class="card-text"><strong>Total - Rs @item.totalAmount</strong></p>
+                                    </div>
+                                </div>
+                            }
+                            else if (item.OrderDetails.Count > 1)
+                            {
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-1 pb-6">
+                                                @if (orderItem.Pizza.category.ToLower() == "non veg")
+                                                {
+                                                    <img src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
+                                                }
+                                                else
+                                                {
+                                                    <img width="15" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Indian-vegetarian-mark.svg" />
+
+                                                }
+                                            </div>
+                                            <div class="col-md-10">
+                                                <p class="card-text">@orderItem.Pizza.name x @orderItem.quantity</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-end">
+                                        <p class="card-text"><strong>Total - Rs @item.totalAmount</strong></p>
+                                    </div>
+                                </div>
+                                <div class="text-muted my-2">
+                                    @{
+                                        var cnt = (item.OrderDetails.Count - 1);
+                                    }
+                                    <h6> + @cnt more item</h6>
+                                </div>
+                                break;
+                            }
+                        }
+
+
+                        
+
+
+                    </div>
+                    <div class="card-footer" style="background-color: white;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a class="btn btn-danger" id="detail" orderId="@item.id" data-toggle="modal" data-target="#productDetailModal">View Details</a>
+
+                            </div>
+                            @if (!User.IsInRole("delivery"))
+                            {
+                                <div class="col-md-6 d-flex justify-content-end">
+                                    @if (item.status == "Cancelled" || item.status=="Delivered")
+                                    {
+                                        <a class="btn btn-secondary disabled cancelOrder" id="cancelOrder" orderId="@item.id">Cancel Order</a>
+
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-secondary cancelOrder" id="cancelOrder" orderId="@item.id">Cancel Order</a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-6 d-flex justify-content-end">
+                                   @if ( item.status != "Cancelled" && item.status!="Delivered" )
+                                    {
+                                    <a class="btn btn-secondary changeStatus" id="changeStatus" orderId="@item.id">Change Status</a>
+
+                                    }
+                                 </div>
+                            }
+                                </div>
+                            </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    <script>
+        $('#productDetailModal').on('show.bs.modal',function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button);
+            var id = button.attr("orderId");
+            console.log(id);
+            var str = "/OrderHistory/ModalPop/" + parseInt(id);
+            console.log(str);
+            $('#productDetailModal').attr("data-url",str)
+            var url = $('#productDetailModal').data('url');
+            $.get(url, function (data) {
+                $("#productDetailModal").html(data);
+                $("#productDetailModal").modal('show');
+            })
+        })
+
+        $(document).click(function (event) {
+            
+            //if you click on anything except the modal itself or the "open modal" link, close the modal
+            if (!$(event.target).closest(".modal ").length) {
+                $(document).find(".modal").modal("hide",);
+            }
+        });
+
+        $('.cancelOrder').click(function () {
+            var orderId = parseInt($(this).attr('orderId'));
+            var status = new Object();
+            status.status = "Cancelled";
+            $.ajax({
+                url: 'https://localhost:44355/api/order' + "/" + orderId,
+                type: 'PUT',
+                dataType: 'json',
+                data: status,
+                success: function (result) {
+                    console.log(result);
+                    bootbox.dialog({
+                        message: 'Order cancelled Successfully',
+                        closeButton: true,
+                        className: 'animate__animated animate__tada',
+                        centerVertical: true,
+                        onEscape: function () {
+                            document.location.reload();
+                        }
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+                }
+                
+
+                })
+        });
+
+        $('.changeStatus').click(function () {
+            var orderId = parseInt($(this).attr('orderId'));
+            var status = new Object();
+            
+            bootbox.prompt({
+                title: "Change Order Status",
+                closeButton: false,
+
+                buttons: {
+                    confirm: {
+                        label: "OK",
+                        className: 'btn-danger',
+                        callback: function (result) {
+                            console.log(result);
+                        },
+                
+                    }
+                },
+                inputType: 'select',
+                inputOptions: [
+
+                    {
+                        text: 'Out For Delivery',
+                        value: 'Out For Delivery',
+                    },
+                    {
+                        text: 'Delivered',
+                        value: 'Delivered',
+                    },
+
+                ],
+                callback: function (result) {
+                    console.log(result);
+                    status.status = result;
+                    if (result != null) {
+                        $.ajax({
+                            url: 'https://localhost:44355/api/order' + "/" + orderId,
+                            type: 'PUT',
+                            dataType: 'json',
+                            data: status,
+                            success: function (result) {
+                                console.log(result);
+                                bootbox.dialog({
+                                    message: 'Status updated Successfully',
+                                    closeButton: true,
+                                    className: 'animate__animated animate__tada',
+                                    centerVertical: true,
+                                    onEscape: function () {
+                                        document.location.reload();
+                                    }
+                                }).find(".modal-dialog")
+                                    .addClass("modal-dialog-centered");
+                            }
+
+
+                        })
+       
+                    }
+                       
+                   
+                }
+            }).find(".modal-dialog").addClass("modal-dialog-centered");
+
+        })
+
+         </script>

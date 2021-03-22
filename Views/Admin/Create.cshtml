@@ -1,0 +1,254 @@
+﻿@model Auth.Models.Pizza
+@using Auth.Models
+@{
+    ViewBag.Title = "Create";
+}
+
+
+
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header justify-content-center">
+                    <h3 class="mb-0">ADD YOUR PIZZA</h3>
+                </div>
+                <div class="card-body">
+                <form class="needs-validation" data-fv-framework="bootstrap" id="createForm" onsubmit="return false">
+
+
+                    <div class="form-horizontal ">
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.name, htmlAttributes: new { @class = "control-label " })
+
+                            @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "form-control col-md-12", @id = "name" } })
+                            @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
+
+                        </div>
+
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.description, htmlAttributes: new { @class = "control-label" })
+
+                            @Html.TextAreaFor(model => model.description, new { @class = "form-control col-md-12", @id = "description" })
+                            @Html.ValidationMessageFor(model => model.description, "", new { @class = "text-danger" })
+
+
+                        </div>
+
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.category, htmlAttributes: new { @class = "control-label " })
+
+                            @Html.DropDownList("category", new SelectList(Enum.GetValues(typeof(cat))), "Select Category", new { @class = "form-control col-md-12" })
+                            @Html.ValidationMessageFor(model => model.category, "", new { @class = "text-danger" })
+
+
+
+                        </div>
+
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.imageUrl, htmlAttributes: new { @class = "control-label" })
+
+                            @Html.EditorFor(model => model.imageUrl, new { htmlAttributes = new { @class = "form-control col-md-12", @id = "imageUrl" } })
+                            @Html.ValidationMessageFor(model => model.imageUrl, "", new { @class = "text-danger" })
+
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-1 ">
+                                <label class="control-label"> Size</label>
+                            </div>
+                            <div class="col">
+                                <div class="form-check" >
+                                    <input class="form-check-input"  type="checkbox" name="small" onclick="dynInput(this);" id="checked1" />
+                                    <label class="form-check-label" for="checked1">
+                                        Small
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="medium" onclick="dynInput(this);" id="checked2" />
+
+                                    <label class="form-check-label" for="checked2">
+                                        Medium
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="large" onclick="dynInput(this);" id="checked3" />
+
+                                    <label class="form-check-label" for="checked3">
+                                        Large
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <p id="insertinputs"></p>
+
+
+
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-offset-2 col-md-6">
+                                    <input type="submit" id="but" value="Create" class="btn btn-danger" />
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.ActionLink("Back to Products", "Index")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                    </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div id="wait" style="display:none;width:69px;height:89px;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;">
+
+        <img src="~/Content/images/demo_wait.gif" width="64" height="64" />
+        <br>
+        Loading..
+    </div>
+
+  
+    <script>
+        var listOfCheckedSizes = [];
+        var listOfPrices = [];
+        var pizId = null;
+        function dynInput(cbox) {
+            if (cbox.checked) {
+                var input = document.createElement("input");
+                input.type = "text";
+                input.required = true;
+                input.setAttribute("data-val", "true");
+                input.setAttribute("data-val-required", "Required");
+              
+                input.id = cbox.name + "input";
+                input.className="form-control col-md-12"
+                var div = document.createElement("div");
+                listOfCheckedSizes.push(cbox.name);
+                div.id = cbox.name;
+                div.innerHTML = "Price For " + cbox.name +"<br>";
+                div.appendChild(input);
+                document.getElementById("insertinputs").appendChild(div);
+
+                var errorSpan = document.createElement("span");
+                errorSpan.className = "field-validation-valid text-danger";
+                errorSpan.setAttribute("data-valmsg-for", input.id);
+                errorSpan.setAttribute('data-valmsg-replace', "true")
+                document.getElementById("insertinputs").appendChild(errorSpan);
+            } else {
+                document.getElementById(cbox.name).remove();
+
+                var index = listOfCheckedSizes.indexOf(cbox.name);
+                if (index > -1)
+                    listOfCheckedSizes.splice(index, 1);
+            }
+        }
+
+                document.getElementById("but").addEventListener("click", function () {
+
+                    var vForm = $("#createForm");
+                   
+                    if (vForm[0].checkValidity() === false ) {
+
+                        console.log("false")
+
+
+                    } else if (listOfCheckedSizes.length>0) {
+                        console.log("true")
+                        var inventoryObj = new Object();
+                        var pizza = new Object();
+                        pizza.name = document.getElementById("name").value;
+                        pizza.description = document.getElementById("description").value;
+                        pizza.category = document.getElementById("category").value;
+                        pizza.imageUrl = document.getElementById("imageUrl").value;
+                        $.ajax({
+                            url: 'https://localhost:44355/api/Admin',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: pizza,
+                            beforeSend: function () {
+                                $("#wait").css("display", "block");
+                            },
+                            success: function (result) {
+
+                                $("#wait").css("display", "none");
+
+                                pizId = result['id'];
+                                for (var i = 0; i < listOfCheckedSizes.length; i++) {
+                                    
+                                    inventoryObj.pizzaId = pizId;
+                                    inventoryObj.quantity = 0;
+                                    var size_price = new Object();
+                                    var price = document.getElementById(listOfCheckedSizes[i] + "input").value;
+                                    listOfPrices.push(price);
+
+                                    size_price.name = listOfCheckedSizes[i];
+                                    size_price.price = price;
+                                    size_price.pizzaId = pizId;
+
+                                    $.ajax({
+
+                                        url: 'https://localhost:44355/api/size',
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        data: size_price,
+                                        success: function (result) {
+                                            console.log("size entered");
+
+
+                                           
+
+
+                                            document.location.reload();
+                                        },
+
+
+                                    });
+                                }
+                            },
+                            complete: function () {
+                                $("#wait").css("display", "none");
+                                $.ajax({
+
+                                    url: 'https://localhost:44355/api/inventory',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: inventoryObj,
+                                    success: function (result) {
+                                        console.log("size entered");
+
+
+                                    },
+
+
+                                });
+                            },
+                        });
+                    }
+
+            //for (var i = 0; i < listOfCheckedSizes.length; i++) {
+            //    console.log(listOfCheckedSizes[i])
+            //}
+
+
+
+        });
+
+    </script>
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
