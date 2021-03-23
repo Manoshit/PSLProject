@@ -11,5 +11,7 @@ namespace Auth.Models
         public string firstName { get; set; }
         public string lastName { get; set; }
         public string address { get; set; }
+
+        public long contactNumber { get; set; }
     }
 }

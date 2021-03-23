@@ -63,6 +63,26 @@ namespace Auth.Controllers
                     ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
                 }
             }
+            using (var client = new HttpClient())
+            {
+
+
+                var responseTask = client.GetAsync("https://localhost:44355/api/inventory");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsAsync<IEnumerable<PizzaStock>>();
+                    readTask.Wait();
+
+                    obj.pizzaStocks = readTask.Result.ToList();
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
+                }
+            }
 
             return View(obj);
 

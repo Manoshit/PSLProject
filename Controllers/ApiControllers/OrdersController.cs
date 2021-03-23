@@ -14,6 +14,14 @@ namespace Auth.Controllers.ApiControllers
     {
         private IDBContext db = new ApplicationDbContext();
 
+        public OrderController()
+        {
+
+        }
+        public OrderController( IDBContext icontext)
+        {
+            db = icontext;
+        }
     
         public IHttpActionResult GetOrders()
         {
@@ -203,7 +211,7 @@ namespace Auth.Controllers.ApiControllers
 
             // Commit changes to db             
             db.SaveChanges();
-      return CreatedAtRoute("DefaultApi", new { id = order.id }, order);
+      return Ok(order);
         }
 
         // DELETE: api/Orders/5

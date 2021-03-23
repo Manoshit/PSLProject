@@ -8,13 +8,13 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
-namespace Auth.Controllers.ApiControllers
+namespace Auth.Controllers
 {
     public class UserController : Controller
     {
           public ActionResult Index()
           {
-                return View();
+                return View("Index");
           }
 
 
@@ -22,7 +22,7 @@ namespace Auth.Controllers.ApiControllers
             [HttpGet]
             public ActionResult LogIn()
             {
-                return View();
+                return View("LogIn");
             }
 
        
@@ -33,7 +33,7 @@ namespace Auth.Controllers.ApiControllers
                 
                 if (IsValid(userr.Email, userr.Password))
                 {
-                    FormsAuthentication.SetAuthCookie(userr.Email, false);
+                   FormsAuthentication.SetAuthCookie(userr.Email, false);
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -46,7 +46,7 @@ namespace Auth.Controllers.ApiControllers
             [HttpGet]
             public ActionResult Register()
             {
-                return View();
+                return View("Register");
             }
 
 
@@ -59,12 +59,17 @@ namespace Auth.Controllers.ApiControllers
                 {
                     if (ModelState.IsValid)
                     {
+                       
                         using (var db = new ApplicationDbContext())
+                        {
+                        var res = db.Registeration.Where(r => r.Email.Trim().ToLower() == user.Email.Trim().ToLower()).FirstOrDefault();
+
+                        if (res == null)
                         {
                             var crypto = new SimpleCrypto.PBKDF2();
                             var encrypPass = crypto.Compute(user.Password);
                             var newUser = db.Registeration.Create();
-                            newUser.Email = user.Email;
+                            newUser.Email = user.Email.ToLower();
                             newUser.Password = encrypPass;
                             newUser.PasswordSalt = crypto.Salt;
                             newUser.FirstName = user.FirstName;
@@ -72,11 +77,16 @@ namespace Auth.Controllers.ApiControllers
                             newUser.UserType = "User";
                             newUser.CreatedDate = DateTime.Now;
                             newUser.IsActive = true;
-                            newUser.IpAddress = "642 White Hague Avenue";
-                             newUser.Address = user.Address;
+                            newUser.ContactNumber = user.ContactNumber;
+                            newUser.Address = user.Address;
                             db.Registeration.Add(newUser);
                             db.SaveChanges();
                             return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "User already exists");
+                        }
                         }
                     }
                     else
@@ -106,7 +116,7 @@ namespace Auth.Controllers.ApiControllers
             public ActionResult LogOut()
             {
           
-                FormsAuthentication.SignOut();
+               FormsAuthentication.SignOut();
                 return RedirectToAction("Index", "Home");
             }
             public bool NameValidation(string fname, string lname)
@@ -182,7 +192,7 @@ namespace Auth.Controllers.ApiControllers
 
                 using (var db = new ApplicationDbContext())
                 {
-                    var user = db.Registeration.FirstOrDefault(u => u.Email == email);
+                    var user = db.Registeration.Where(u => u.Email == email).FirstOrDefault();
                     if (user != null)
                     {
                         if (user.Password == crypto.Compute(password, user.PasswordSalt))

@@ -11,6 +11,7 @@ using System.Web.Mvc;
 
 namespace Auth.Controllers
 {
+    [Authorize(Roles =("admin"))]
     public class DeliveryController : Controller
     {
         // GET: Delivery
@@ -30,7 +31,7 @@ namespace Auth.Controllers
                     var readTask = result.Content.ReadAsAsync<IEnumerable<Registeration>>();
                    
                     readTask.Wait();
-                     obj = readTask.Result.ToList();
+                     obj = readTask.Result.Where(o=>o.IsRemoved!=true).ToList();
 
                 }
                 else
@@ -72,6 +73,33 @@ namespace Auth.Controllers
                 }
             }
             return RedirectToAction("Index", "Delivery");
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var obj = new Registeration();
+            using (var client = new HttpClient())
+            {
+
+
+                var responseTask = client.GetAsync("https://localhost:44355/api/delivery");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsAsync<IEnumerable<Registeration>>();
+
+                    readTask.Wait();
+                    obj = readTask.Result.Where(o => o.UserId == id).FirstOrDefault();
+
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
+                }
+            }
+            return View(obj);
         }
     }
 }

@@ -24,7 +24,14 @@ namespace Auth.Controllers.ApiControllers
         {
             var userDetails = context.Registeration.Where(r => r.Email.ToLower() == email).FirstOrDefault();
 
-            return Ok(userDetails);
+            if (userDetails == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(userDetails);
+            }
         }
 
         public IHttpActionResult Put([FromBody]ProfileModel profile)
@@ -32,15 +39,15 @@ namespace Auth.Controllers.ApiControllers
             var res = context.Registeration.Where(r => r.Email.ToLower() == profile.email.ToLower()).FirstOrDefault();
             if(res==null)
             {
-                return NotFound();
+                return BadRequest();
             }
             res.FirstName = profile.firstName;
             res.LastName = profile.lastName;
             res.Address = profile.address;
-
+            res.ContactNumber = profile.contactNumber;
             context.SaveChanges();
 
-            return Ok(profile);
+            return Ok(res);
         }
     }
 }

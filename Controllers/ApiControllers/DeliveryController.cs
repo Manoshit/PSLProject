@@ -56,7 +56,7 @@ namespace Auth.Controllers.ApiControllers
                         newUser.UserType = "Delivery";
                         newUser.CreatedDate = DateTime.Now;
                         newUser.IsActive = true;
-                        newUser.IpAddress = "642 White Hague Avenue";
+                        newUser.ContactNumber = user.ContactNumber;
                         newUser.Address = user.Address;
                         db.Registeration.Add(newUser);
                         db.SaveChanges();
@@ -87,17 +87,33 @@ namespace Auth.Controllers.ApiControllers
 
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
+        public IHttpActionResult Put(int id,[FromBody] ProfileModel profile)
         {
+            var res = db.Registeration.Find(id);
+
+            if(res==null)
+            {
+                return BadRequest();
+            }
+
+            res.FirstName = profile.firstName;
+            res.LastName = profile.lastName;
+            res.Address = profile.address;
+            res.ContactNumber = profile.contactNumber;
+
+            db.SaveChanges();
+
+            return Ok(res);
         }
 
-        // DELETE api/<controller>/5
+
         public IHttpActionResult Delete(int id)
         {
             var res = db.Registeration.Find(id);
-            if(res.IsActive)
+            if (res.IsActive)
             {
-                db.Registeration.Remove(res);
+                res.IsRemoved = true;
+                res.IsActive = false;
             }
             else
             {

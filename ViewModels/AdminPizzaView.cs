@@ -10,5 +10,7 @@ namespace Auth.ViewModels
     {
         public List<Pizza> pizzas{get;set;}
         public List<Size> sizes { get; set; }
+
+        public List<PizzaStock> pizzaStocks { get; set; }
     }
 }

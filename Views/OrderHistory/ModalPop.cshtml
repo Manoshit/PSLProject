@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-md-5">
 
-                <p><strong>@Model.timeStamp</strong></p>
+                    <p><strong>@Model.timeStamp</strong></p>
 
                 </div>
                 <div class="col-md-1">
@@ -28,7 +28,16 @@
 
 
             </div>
-            <div class=row><div class=col-md-12><p>STATUS : @Model.status.ToUpperInvariant() </p></div></div>
+            <div class=row><div class=col-md-12><p><strong> Status </strong> :  @Model.status </p></div></div>
+
+            @if (User.IsInRole("user") || User.IsInRole("admin"))
+            {
+                if (Model.status != "Cancelled")
+                {
+                    <div class=row><div class=col-md-12><p><strong>Delivery Executive</strong> : @Model.DeliveryExecutive.FirstName @Model.DeliveryExecutive.LastName @Model.DeliveryExecutive.ContactNumber </p></div></div>
+                }
+            }
+
             <hr />
             <div class=row>
 
@@ -38,7 +47,7 @@
 
                 </div>
 
-              </div>
+            </div>
             <div class="row">
                 <div class=col md-12>
 
@@ -56,7 +65,7 @@
             {
                 <div class="row">
                     <div class="col-md-1 pl-3">
-                        @if (item.Pizza.category.ToLower() == "non veg")
+                        @if (item.Pizza.category.ToLower() == "nonveg")
                         {
                             <img src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
                         }
@@ -68,13 +77,13 @@
                     </div>
                     <div class="col-md-11 pr-5">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                                 @item.Pizza.name - @item.pizzaSize x @item.quantity
                             </div>
                             @{
                                 var price = @item.quantity * item.price;
                             }
-                            <div class="col-md-4 d-flex justify-content-end">
+                            <div class="col-md-3 d-flex justify-content-end">
                                 <strong> Rs  @price</strong>
                             </div>
                         </div>

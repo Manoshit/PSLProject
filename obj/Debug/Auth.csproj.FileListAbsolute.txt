@@ -127,5 +127,6 @@ C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.addedPizzaPriceForOrderD
 C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.changedRegisterationModel.resources
 C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.droppedPrimaryKeyFromEmailToId.resources
 C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.didSomething.resources
-C:\Users\hp\source\repos\Auth\obj\Debug\Auth.csprojAssemblyReference.cache
 C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.resources
+C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.addedFieldForContactNumber.resources
+C:\Users\hp\source\repos\Auth\obj\Debug\Auth.Migrations.addedFieldForIsRemoved.resources

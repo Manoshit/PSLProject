@@ -195,7 +195,6 @@
     <Compile Include="Controllers\ApiControllers\DeliveryController.cs" />
     <Compile Include="Controllers\ApiControllers\InventoryController.cs" />
     <Compile Include="Controllers\ApiControllers\OrdersController.cs" />
-    <Compile Include="Controllers\ApiControllers\PaymentGatewayController.cs" />
     <Compile Include="Controllers\ApiControllers\PizzaFilterController.cs" />
     <Compile Include="Controllers\ApiControllers\ProfileController.cs" />
     <Compile Include="Controllers\ApiControllers\SizeController.cs" />
@@ -266,6 +265,14 @@
     <Compile Include="Migrations\202103211249202_addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.cs" />
     <Compile Include="Migrations\202103211249202_addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.Designer.cs">
       <DependentUpon>202103211249202_addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202103220921042_addedFieldForContactNumber.cs" />
+    <Compile Include="Migrations\202103220921042_addedFieldForContactNumber.Designer.cs">
+      <DependentUpon>202103220921042_addedFieldForContactNumber.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202103221003437_addedFieldForIsRemoved.cs" />
+    <Compile Include="Migrations\202103221003437_addedFieldForIsRemoved.Designer.cs">
+      <DependentUpon>202103221003437_addedFieldForIsRemoved.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -463,6 +470,7 @@
     <Content Include="Views\Inventory\Index.cshtml" />
     <Content Include="Views\Delivery\Index.cshtml" />
     <Content Include="Views\Delivery\Create.cshtml" />
+    <Content Include="Views\Delivery\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -514,6 +522,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202103211249202_addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.resx">
       <DependentUpon>202103211249202_addedModelsForDeliveryExecAndSeparateTableForMaintainingQuantity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202103220921042_addedFieldForContactNumber.resx">
+      <DependentUpon>202103220921042_addedFieldForContactNumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202103221003437_addedFieldForIsRemoved.resx">
+      <DependentUpon>202103221003437_addedFieldForIsRemoved.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

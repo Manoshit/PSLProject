@@ -17,7 +17,20 @@
         <div class="card h-100">
             <img class="card-img-top" src="@item.imageUrl" alt="Bologna">
             <div class="card-body">
-                <h4 class="card-title">@item.name</h4>
+                <div class="row">
+                    <div class="col-md-10"><h4 class="card-title">@item.name</h4></div>
+                    <div class="col-md-2">
+                        @if (item.category == "Veg")
+                        {
+                            <img width="20" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Indian-vegetarian-mark.svg" />
+
+                        }
+                        else
+                        {
+                            <img width="20" src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
+                        }
+                    </div>
+                </div>
                 <p class="card-text">@item.description </p>
                 <hr />
                 <div class="row">
@@ -41,11 +54,23 @@
             <div class="card-footer bg-transparent">
                 <div class="row">
                     <div class="col-md-6">
-                        @Html.ActionLink("Edit", "Edit", "Admin", new { id = item.id }, new { })
+                        @Html.ActionLink("Edit", "Edit", "Admin", new { id = item.id }, new { @class = "btn btn-block btn-outline-secondary" })
                     </div>
-                    <div class="col-md-6 d-flex justify-content-end" >
-                        <a href="#" id="@item.id" class="btn  btn-danger" data-toggle="modal" data-target="#smallModal">Delete</a>
-                    </div>
+                    @{
+                        var quantity = Model.pizzaStocks.Where((ps) => ps.pizzaId == item.id).FirstOrDefault();
+                    }
+                    @if (quantity.quantity != 0)
+                    {
+                        <div class="col-md-6 d-flex justify-content-end">
+                            <a href="#" id="@item.id" class="btn  btn-outline-danger btn-block" data-toggle="modal" data-target="#smallModal"> Out Of Stock</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-6 d-flex justify-content-end">
+                            <a href="#"  class="btn  btn-outline-danger btn-block disabled"> Out Of Stock</a>
+                        </div>
+                    }
                 </div>
 
 
@@ -53,10 +78,10 @@
         </div>
 
         <div class="modal fade" id="smallModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-dialog modal-dialog-centered modal-md">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">Delete Pizza</h4>
+                        <h4 class="modal-title" id="myModalLabel">Mark As Out Of Stock</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -80,47 +105,25 @@
   
     $('#smallModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget) 
-
+        var quantity = new Object();
+        quantity.value = 0;
         console.log(button.attr("id"));
         document.getElementById("Delete").addEventListener("click", function () {
 
             $.ajax({
-                url: 'https://localhost:44355/api/size' + "/" + button.attr("id"),
-                type: 'DELETE',
-
-                contentType: 'application/json',
-
+                url: 'https://localhost:44355/api/inventory' + "/" + button.attr("id"),
+                type: 'PUT',
+                dataType: 'json',
+                data:quantity,
                 success: function (result) {
-                    console.log("size deleted");
+                    
                 },
-                complete: function () {
+                complete: function (result) {
+                    console.log(result.responseText);
+                 $('#smallModal').modal('hide');
 
-                    $.ajax({
-                        url: 'https://localhost:44355/api/admin' + "/" + button.attr("id"),
-                        type: 'DELETE',
-
-                        contentType: 'application/json',
-
-                        success: function (result) {
-                            console.log("pizza deleted");
-
-                            $.ajax({
-                                url: 'https://localhost:44355/api/inventory' + "/" + button.attr("id"),
-                                type: 'DELETE',
-
-                                contentType: 'application/json',
-
-                            })
-
-                         },
-
-                        complete: function () {
-                            $('#smallModal').modal('hide');
-
-                            document.location.reload();
-                        }
-
-                    })
+                     document.location.reload();
+                   
                 }
             })
         

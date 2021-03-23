@@ -32,10 +32,10 @@ namespace Auth.Controllers.ApiControllers
 
                 if (res == null)
                 {
-                    return Content(HttpStatusCode.NotFound, "Cart not found");
+                    return NotFound();
                 }
                 else
-                    return Ok(res);
+                    return Ok(res.ToList());
             }
         }
 
@@ -72,6 +72,9 @@ namespace Auth.Controllers.ApiControllers
                 {
                     // Get cart item
                     var cart = context.Carts.Find(id);
+                    if (cart == null)
+                        return NotFound();
+
                     cart.quantity = (int)quantity;
 
                   //  context.MarkAsModified(cart);

@@ -1,10 +1,9 @@
 ﻿
-
 @model Auth.Models.Registeration
 
 
 @{
-    ViewBag.Title = "Profile";
+    ViewBag.Title = "Edit";
     //  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,12 +13,12 @@
         <div class="col-md-5">
             <div class="card">
                 <div class="card-header justify-content-center">
-                    <h3 class="mb-0">Your Profile</h3>
+                    <h3 class="mb-0">Profile</h3>
                 </div>
                 <div class="card-body">
 
-                   <form onsubmit="return false">
-                       
+                    <form onsubmit="return false">
+
                         <div>
                             <fieldset>
 
@@ -52,7 +51,7 @@
                                 </div>
 
                                 <div class="my-3">
-                                    <input type="submit" id="save" value="Save Changes" class="col-md-12 btn btn-outline-secondary btn-block" />
+                                    <input type="submit" id="save" name="@Model.UserId" value="Save Changes" class="col-md-12 btn btn-outline-secondary btn-block" />
                                 </div>
                             </fieldset>
                         </div>
@@ -67,14 +66,14 @@
     $("#save").click(function () {
 
         var profile = new Object();
-
+        var id = parseInt($(this).attr('name'));
         profile.email = $("#email").val();
         profile.lastName = $("#lastName").val();
         profile.firstName = $("#firstName").val();
         profile.address = $("#address").val();
         profile.contactNumber = $("#contactNumber").val();
         $.ajax({
-            url: 'https://localhost:44355/api/Profile',
+            url: 'https://localhost:44355/api/delivery/'+id,
             type: 'PUT',
 
             dataType: 'json',
@@ -86,14 +85,14 @@
             success: function (result) {
 
                 console.log(result);
-               
+
 
             },
             complete: function (result) {
                 if (result.status == 200) {
-                   
+
                     bootbox.dialog({
-                        message: "Your profile was updated",
+                        message: "Delivery Executive profile was updated",
                         closeButton: true
 
                     }).find(".modal-dialog").addClass("modal-dialog-centered");
@@ -111,6 +110,8 @@
         });
     });
 </script>
+
+
 
 
 

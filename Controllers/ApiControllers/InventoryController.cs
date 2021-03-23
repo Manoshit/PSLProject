@@ -40,10 +40,10 @@ namespace Auth.Controllers.ApiControllers
 
         public IHttpActionResult Put(int id, [FromBody] Quantity quantity)
         {
-            var res = context.PizzaStocks.Find(id);
+            var res = context.PizzaStocks.Where((ps)=>ps.pizzaId==id).FirstOrDefault();
             if(res==null)
             {
-                return NotFound();
+                return BadRequest();
             }
             res.quantity = quantity.value;
             context.SaveChanges();

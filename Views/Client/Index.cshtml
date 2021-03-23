@@ -22,7 +22,7 @@
 
 
 
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="row row-cols-1 row-cols-md-3 g-3">
     @foreach (var item in Model.pizzas)
     {
 
@@ -32,7 +32,20 @@
             <div class="card h-100">
                 <img class="card-img-top" src="@item.imageUrl" alt="Bologna">
                 <div class="card-body">
-                    <h4 class="card-title" id="name">@item.name</h4>
+                    <div class="row">
+                        <div class="col-md-10"><h4 class="card-title" id="name">@item.name</h4></div>
+                        <div class="col-md-1">
+                        @if (item.category == "Veg")
+                        {
+                            <img width="20" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Indian-vegetarian-mark.svg" />
+
+                        }
+                        else
+                        {
+                        <img width="20" src="https://img.icons8.com/fluent/17/000000/non-vegetarian-food-symbol.png" />
+                        }
+                        </div>
+                    </div>
                     <p class="card-text" id="desc">@item.description </p>
                     <hr />
                     <div class="row">
@@ -60,13 +73,27 @@
 
                 </div>
                 <div class="card-footer bg-transparent">
+                    @{
+                        var quantity = Model.pizzaStocks.Where((ps) => ps.pizzaId == item.id).FirstOrDefault();
+                    }
+                    @if (quantity.quantity != 0)
+                    {
                     <div class="row">
 
                         <div class="col-md-12">
                             <a href="#" id="Add" data-select="@item.id.ToString()" class="btn-outline-success btn btn-block editbutton" data-toggle="modal" data-target="#smallModal">ADD TO CART</a>
                         </div>
                     </div>
+                    }
+                    else
+                    {
+                    <div class="row">
 
+                        <div class="col-md-12">
+                            <a href="#" class="btn-outline-secondary btn btn-block disabled ">OUT OF STOCK</a>
+                        </div>
+                    </div>
+                    }
 
                 </div>
             </div>
@@ -126,8 +153,31 @@
             data: cartItem,
             complete: function (result) {
 
-                if (result.status == 200)
-                    $('.toast').toast('show');
+                if (result.status == 200) {
+                    bootbox.dialog({
+                        message: 'Added To Cart',
+                        closeButton: true,
+                        className: 'animate__animated animate__tada',
+                        centerVertical: true,
+                        onEscape: function () {
+                            document.location.reload();
+                        }
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+                } else {
+                    bootbox.dialog({
+                        message: result.responseJSON["Message"],
+                        closeButton: true,
+                        className: 'animate__animated animate__tada',
+                        centerVertical: true,
+                        onEscape: function () {
+                            document.location.reload();
+                        }
+                    }).find(".modal-dialog")
+                        .addClass("modal-dialog-centered");
+
+                }
+                    
                
             }
         });
